@@ -60,8 +60,7 @@
           uses: actions/cache@v2
           with:
             path: |
-              node_modules/.cache/webpack
-              */*/node_modules/.cache/webpack
+              website/node_modules/.cache/webpack
             key: node_modules/.cache/webpack-${{github.ref}}
             restore-keys: |
               node_modules/.cache/webpack-${{github.ref}}
