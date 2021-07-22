@@ -43,11 +43,9 @@
         - name: Cache Docusaurus Build
           uses: actions/cache@v2
           with:
-            path: |
-              website/node_modules/.cache/webpack
-            key: node_modules/.cache/webpack-${{github.ref}}
-            restore-keys: |
-              node_modules/.cache/webpack-${{github.ref}}
+            path: website/node_modules/.cache/webpack
+            key: cache/webpack-${{github.ref}}
+            restore-keys: cache/webpack-${{github.ref}}
 
         - name: Build Production
           if: github.ref == 'refs/heads/master'
