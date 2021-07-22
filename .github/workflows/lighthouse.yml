@@ -1,4 +1,4 @@
-name: Verdaccio LightHouse Testing CI
+name: Verdaccio Lighthouse Testing CI
 
 on:
   pull_request:
@@ -8,6 +8,7 @@ on:
     paths:
       - 'website/**'
       - 'package.json'
+      - './github/workflows/lighthouse.yml'
       - './github/workflows/website.yml'
 
 jobs:
