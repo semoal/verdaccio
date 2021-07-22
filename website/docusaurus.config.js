@@ -1,6 +1,6 @@
 // @ts-check
 
-const isDeployPreview = process.env.NETLIFY && process.env.CONTEXT === 'deploy-preview';
+const isDeployPreview = process.env.CONTEXT === 'deploy-preview';
 
 /** @type {import('@docusaurus/types').DocusaurusConfig['i18n']} */
 const i18nConfig = {
