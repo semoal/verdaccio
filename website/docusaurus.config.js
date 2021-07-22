@@ -1,5 +1,4 @@
 // @ts-check
-
 const isDeployPreview = process.env.CONTEXT === 'deploy-preview';
 
 /** @type {import('@docusaurus/types').DocusaurusConfig['i18n']} */
