@@ -44,7 +44,7 @@
           uses: actions/cache@v2
           with:
             path: website/node_modules/.cache/webpack
-            key: cache/webpack-${{github.ref}}
+            key: cache/webpack-${{github.ref}}-${{ hashFiles('**/pnpm-lock.yaml') }}
             restore-keys: cache/webpack-${{github.ref}}
 
         - name: Build Production
@@ -61,3 +61,12 @@
             CONTEXT: deploy-preview
           run: pnpm netlify:build:deployPreview --filter ...@verdaccio/website
 
+        - name: Deploy Preview Netlify
+          if: github.ref != 'refs/heads/master'
+          uses: South-Paw/action-netlify-deploy@v1.2.0
+          with:
+            draft: true
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            netlify-auth-token: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+            netlify-site-id: ${{ secrets.NETLIFY_SITE_ID }}
+            build-dir: './website/build'
