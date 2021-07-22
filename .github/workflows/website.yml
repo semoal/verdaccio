@@ -69,7 +69,7 @@ jobs:
 
       - name: 🔥 Deploy Production Netlify
         if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'workflow_dispatch'
-        uses: semoal/action-netlify-deploy@v1.3.0
+        uses: semoal/action-netlify-deploy@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           netlify-auth-token: ${{ secrets.NETLIFY_AUTH_TOKEN }}
@@ -85,7 +85,7 @@ jobs:
 
       - name: 🤖 Deploy Preview Netlify
         if: github.event_name == 'pull_request' && github.ref != 'refs/heads/master'
-        uses: semoal/action-netlify-deploy@v1.3.0
+        uses: semoal/action-netlify-deploy@master
         with:
           draft: true
           comment-on-pull-request: true

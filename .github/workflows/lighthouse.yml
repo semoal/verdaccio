@@ -59,7 +59,7 @@ jobs:
 
       - name: 🤖 Deploy Preview Netlify
         if: github.event_name == 'pull_request' && github.ref != 'refs/heads/master'
-        uses: semoal/action-netlify-deploy@v1.3.0
+        uses: semoal/action-netlify-deploy@master
         id: netlify_preview
         with:
           draft: true
