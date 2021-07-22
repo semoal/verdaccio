@@ -79,6 +79,7 @@ jobs:
       # Will deploy to Preview URL, only when a pull request is open with changes on the website
       - name: Build Deployment Preview
         if: github.event_name == 'pull_request' && github.ref != 'refs/heads/master'
+        id: netlify_preview
         env:
           CONTEXT: deploy-preview
         run: pnpm netlify:build:deployPreview --filter ...@verdaccio/website
@@ -95,3 +96,49 @@ jobs:
           netlify-auth-token: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           netlify-site-id: ${{ secrets.NETLIFY_SITE_ID }}
           build-dir: './website/build'
+
+      - name: Audit preview URL with Lighthouse
+        if: github.event_name == 'pull_request' && github.ref != 'refs/heads/master'
+        id: lighthouse_audit
+        uses: treosh/lighthouse-ci-action@v3
+        with:
+          urls: |
+            ${{ steps.netlify_preview.outputs.preview-url }}
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+      - name: Format lighthouse score
+        if: github.event_name == 'pull_request' && github.ref != 'refs/heads/master'
+        id: format_lighthouse_score
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const result = ${{ steps.lighthouse_audit.outputs.manifest }}[0].summary
+            const links = ${{ steps.lighthouse_audit.outputs.links }}
+            const formatResult = (res) => Math.round((res * 100))
+            Object.keys(result).forEach(key => result[key] = formatResult(result[key]))
+            const score = res => res >= 90 ? '🟢' : res >= 50 ? '🟠' : '🔴'
+            const comment = [
+                `⚡️ [Lighthouse report](${Object.values(links)[0]}) for the changes in this PR:`,
+                '| Category | Score |',
+                '| --- | --- |',
+                `| ${score(result.performance)} Performance | ${result.performance} |`,
+                `| ${score(result.accessibility)} Accessibility | ${result.accessibility} |`,
+                `| ${score(result['best-practices'])} Best practices | ${result['best-practices']} |`,
+                `| ${score(result.seo)} SEO | ${result.seo} |`,
+                ' ',
+                `*Lighthouse ran on [${Object.keys(links)[0]}](${Object.keys(links)[0]})*`
+            ].join('\n')
+             core.setOutput("comment", comment);
+
+      - name: Add comment to PR
+        if: github.event_name == 'pull_request' && github.ref != 'refs/heads/master'
+        id: comment_to_pr
+        uses: marocchino/sticky-pull-request-comment@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{ github.event.issue.number }}
+          header: lighthouse
+          message: |
+            ${{ steps.format_lighthouse_score.outputs.comment }}
